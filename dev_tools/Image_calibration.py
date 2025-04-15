@@ -1,10 +1,7 @@
 import os
 import tempfile
 import cv2
-import subprocess       
-
-# ADB路径（根据实际情况修改）
-ADB_PATH = "E:\\Program Files\\Netease\\MuMu Player 12\\shell\\adb.exe"
+import subprocess
 
 def capture_screen():
     """截取模拟器屏幕"""
@@ -52,10 +49,10 @@ def find_image_in_screen(template_path, threshold=0.8):
     
     return max_val >= threshold
 
-if __name__ == "__main__":
-    # 模板图片路径
-    template_path = "assets\login\logout.png"
-    if find_image_in_screen(template_path):
-        print("找到目标图片")
-    else:
-        print("未找到目标图片")
+# if __name__ == "__main__":
+#     # 模板图片路径
+#     template_path = "assets\login\logout.png"
+#     if find_image_in_screen(template_path):
+#         print("找到目标图片")
+#     else:
+#         print("未找到目标图片")

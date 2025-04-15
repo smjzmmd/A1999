@@ -1,12 +1,6 @@
 import subprocess
 
-# ADB路径（根据实际情况修改）
-ADB_PATH = "E:\\Program Files\\Netease\\MuMu Player 12\\shell\\adb.exe"
-# 1999包名 adb shell cmd package resolve-activity --brief com.shenlan.m.reverse1999
-REVERSE1999_PACKAGE = "com.shenlan.m.reverse1999"
-REVERSE1999_ACTIVITY = "com.ssgame.mobile.gamesdk.frame.AppStartUpActivity"
-
-def open_1999():
+def open_app():
     """打开1999"""
     try:
         # 启动游戏
@@ -18,4 +12,4 @@ def open_1999():
     return True
 
 if __name__ == "__main__":
-    open_1999()
+    open_app()
