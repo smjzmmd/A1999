@@ -16,6 +16,5 @@ def main():
     # print(f"完整模拟器配置: {emulator_config}")
     adb = ADBController(adb_path=config.get('emulator', 'adb_path'), device_serial=config.get('emulator', 'mumu_serial'))
 
-
 if __name__ == "__main__":
     main()
