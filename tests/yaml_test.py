@@ -1,4 +1,4 @@
-from utils.config_loader import config
+from ..utils.config_loader import config
 
 def main():
     # 获取配置值
