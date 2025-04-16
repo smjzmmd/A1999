@@ -3,18 +3,9 @@ from core.adb_controller import ADBController
 
 def main():
     # 获取配置值
-    # adb_path = config.get('emulator', 'adb_path')
-    # port = config.get('emulator', 'port')
-    # package_name = config.get('game', 'package_name')
-    
-    # print(f"ADB路径: {adb_path}")
-    # print(f"模拟器端口: {port}")
-    # print(f"游戏包名: {package_name}")
-    
-    # # 获取整个emulator配置节
-    # emulator_config = config.get('emulator')
-    # print(f"完整模拟器配置: {emulator_config}")
-    adb = ADBController(adb_path=config.get('emulator', 'adb_path'), device_serial=config.get('emulator', 'mumu_serial'))
+    adb = ADBController(config.get('emulator', 'adb_path'), config.get('emulator', 'mumu_serial'))
+    # 执行操作
+    print(adb.connect())
 
 if __name__ == "__main__":
     main()

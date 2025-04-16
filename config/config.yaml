@@ -1,14 +1,125 @@
 # Mumu模拟器配置
 emulator:
-  adb_path: r"D:\Program Files\Netease\MuMuPlayer-12.0\shell\adb.exe"  # ADB可执行文件路径
-  mumu_serial': '127.0.0.1:7555' #模拟器设备序列号
-  resolution: "1280x720"  # 分辨率
-  nickname: "Mumu模拟器"      # 可选标识名称
+  # adb_path: "C:/Program Files/MuMu/emulator/nemu/vmonitor/bin/adb.exe"  # ADB路径
+  adb_path: "D:\\Program Files\\Netease\\MuMuPlayer-12.0\\shell\\adb.exe"  # ADB路径
+  mumu_serial: "127.0.0.1:7555"  # 模拟器序列号
+  resolution: [1280, 720]  # 模拟器分辨率(宽x高)
+  screenshot_dir: "./resources/screenshots"  # 截图保存目录
+  default_wait: 0.5  # 默认等待时间(秒)
+  max_retry: 3  # 操作最大重试次数
+  debug_mode: false  # 是否启用调试模式
 
-# 游戏配置
+# ADB高级配置
+adb_settings:
+  command_timeout: 30  # ADB命令超时时间(秒)
+  reconnect_attempts: 3  # 连接失败重试次数
+  screenshot_method: "adb"  # 截图方法(adb/opencv)
+  screenshot_delay: 0.3  # 截图后延迟(秒)
+
+  # 图像识别配置
+image_recognition:
+  default_threshold: 0.85  # 默认图像匹配阈值(0-1)
+  template_match_method: "TM_CCOEFF_NORMED"  # 模板匹配方法
+  color_tolerance: 15  # 颜色识别容差
+  enable_image_cache: true  # 是否启用图像缓存
+  cache_expiry: 3600  # 缓存过期时间(秒)
+
+  # OCR文字识别配置
+ocr_settings:
+  tesseract_path: "C:/Program Files/Tesseract-OCR/tesseract.exe"  # Tesseract路径
+  languages: "chi_sim+eng"  # 使用的语言
+  digit_whitelist: "0123456789"  # 数字白名单
+  alphanumeric_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"  # 字母数字白名单
+  min_confidence: 70  # 最小置信度阈值(0-100)
+  text_similarity_threshold: 0.8  # 文本相似度阈值(0-1)
+  
+# 游戏特定配置
+game_settings:
 # 1999包名 adb shell cmd package resolve-activity --brief com.shenlan.m.reverse1999
-game:
   package_name: "com.shenlan.m.reverse1999"  # 游戏包名
   main_activity: "com.ssgame.mobile.gamesdk.frame.AppStartUpActivity"  # 主Activity
+  login_timeout: 30  # 登录超时时间(秒)
+  battle_timeout: 180  # 战斗超时时间(秒)
+  ui_loading_delay: 2.0  # UI加载等待时间(秒)
 
+# 定时任务配置
+scheduled_tasks:
+  daily_reset_time: "04:00"  # 每日重置时间
+  tasks:
+    - name: "daily_quests"
+      enabled: true
+      execution_time: "10:00"
+      script: "daily_tasks.py"
+    - name: "guild_activities"
+      enabled: true
+      execution_time: "20:00"
+      script: "guild_activities.py"
+    - name: "resource_collection"
+      enabled: false
+      interval: 120  # 每120分钟执行一次
+      script: "collect_resources.py"
 
+# UI元素定位配置(示例)
+ui_elements:
+  login_screen:
+    start_button: 
+      template: "./resources/images/buttons/start_button.png"
+      threshold: 0.9
+      region: [800, 600, 1120, 720]  # [x1,y1,x2,y2]
+    server_selection:
+      template: "./resources/images/buttons/server_select.png"
+      threshold: 0.85
+  main_menu:
+    battle_button:
+      template: "./resources/images/buttons/battle.png"
+      threshold: 0.8
+    shop_button:
+      template: "./resources/images/buttons/shop.png"
+      color: [255, 200, 50]  # BGR颜色值
+      tolerance: 20
+  battle_screen:
+    auto_battle:
+      template: "./resources/images/buttons/auto_battle.png"
+      threshold: 0.75
+    skill_buttons:
+      - template: "./resources/images/skills/skill1.png"
+        threshold: 0.8
+      - template: "./resources/images/skills/skill2.png"
+        threshold: 0.8
+
+# 性能配置
+performance:
+  cpu_usage_limit: 80  # CPU使用率限制(%)
+  memory_usage_limit: 70  # 内存使用率限制(%)
+  check_interval: 60  # 性能检查间隔(秒)
+  recovery_delay: 300  # 性能恢复后延迟(秒)
+
+# 网络配置
+network:
+  proxy_enabled: false
+  proxy_address: "127.0.0.1"
+  proxy_port: 8888
+  network_check_url: "https://www.baidu.com"
+  timeout: 10  # 网络超时时间(秒)
+
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG/INFO/WARNING/ERROR/CRITICAL
+  file_path: "./resources/logs/automation.log"
+  max_size: 10  # 日志文件最大大小(MB)
+  backup_count: 5  # 保留的日志文件数量
+  console_output: true  # 是否输出到控制台
+
+# 通知配置
+notifications:
+  email:
+    enabled: false
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    username: "your_email@example.com"
+    password: "your_password"
+    recipients: ["notify@example.com"]
+  discord:
+    enabled: false
+    webhook_url: "https://discord.com/api/webhooks/..."
+  on_failure: true  # 仅在失败时发送通知

@@ -25,12 +25,12 @@ class ConfigLoader:
         with open(config_path, 'r', encoding='utf-8') as f:
             self._config = yaml.safe_load(f)
         
-        # 设置ADB路径为绝对路径
-        if 'emulator' in self._config and 'adb_path' in self._config['emulator']:
-            adb_path = Path(self._config['emulator']['adb_path'])
-            if not adb_path.is_absolute():
-                adb_path = project_root / adb_path
-            self._config['emulator']['adb_path'] = str(adb_path.resolve())
+        # # 设置ADB路径为绝对路径
+        # if 'emulator' in self._config and 'adb_path' in self._config['emulator']:
+        #     adb_path = Path(self._config['emulator']['adb_path'])
+        #     if not adb_path.is_absolute():
+        #         adb_path = project_root / adb_path
+        #     self._config['emulator']['adb_path'] = str(adb_path.resolve())
     
     def get(self, *keys) -> Any:
         """获取嵌套配置值"""

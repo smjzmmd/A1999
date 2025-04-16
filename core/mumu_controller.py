@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image
 from .adb_controller import ADBController
 from .image_processor import ImageProcessor
+from .ocr_processor import OCRProcessor
 
 class MuMuController:
     def __init__(self, config: Dict[str, Any]):
@@ -31,6 +32,13 @@ class MuMuController:
         
         # 初始化图像处理器
         self.image_processor = ImageProcessor()
+
+        # 初始化OCR处理器
+        self.ocr = OCRProcessor(
+            tesseract_path=config.get('tesseract_path'),
+            lang=config.get('ocr_lang', 'chi_sim+eng'),
+            debug=config.get('debug_ocr', False)
+        )
         
         # 设备分辨率
         self.width, self.height = config['resolution']
@@ -244,3 +252,82 @@ class MuMuController:
             self.logger.info(f"已重启应用: {package_name}")
         except Exception as e:
             self.logger.error(f"重启应用失败: {str(e)}")
+
+    def recognize_text(self, region: Tuple[int, int, int, int] = None) -> str:
+        """
+        识别屏幕上的文字
+        
+        :param region: 可选区域(x1,y1,x2,y2)
+        :return: 识别出的文本
+        """
+        screenshot = self.take_screenshot()
+        if screenshot is None:
+            return ""
+            
+        if region:
+            x1, y1, x2, y2 = region
+            roi = screenshot[y1:y2, x1:x2]
+        else:
+            roi = screenshot
+            
+        return self.ocr.recognize_text(roi)
+
+    def find_text_position(self, target_text: str, 
+                         region: Tuple[int, int, int, int] = None,
+                         partial_match: bool = False) -> Optional[Tuple[int, int, int, int]]:
+        """
+        查找文本在屏幕上的位置
+        
+        :param target_text: 要查找的文本
+        :param region: 可选搜索区域(x1,y1,x2,y2)
+        :param partial_match: 是否允许部分匹配
+        :return: 文本区域坐标(x1,y1,x2,y2)或None
+        """
+        screenshot = self.take_screenshot()
+        if screenshot is None:
+            return None
+            
+        return self.ocr.find_text_position(screenshot, target_text, region, partial_match)
+
+    def wait_until_text(self, target_text: str, 
+                       timeout: int = 10, 
+                       interval: float = 0.5,
+                       **kwargs) -> Optional[Tuple[int, int, int, int]]:
+        """
+        等待直到屏幕上出现指定文本
+        
+        :param target_text: 要等待的文本
+        :param timeout: 超时时间(秒)
+        :param interval: 检查间隔(秒)
+        :param kwargs: 传递给find_text_position的其他参数
+        :return: 文本区域坐标(x1,y1,x2,y2)或None
+        """
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            pos = self.find_text_position(target_text, **kwargs)
+            if pos:
+                return pos
+            time.sleep(interval)
+            
+        self.logger.warning(f"等待文本 '{target_text}' 超时 ({timeout}秒)")
+        return None
+
+    def click_text(self, target_text: str, 
+                  timeout: int = 10,
+                  **kwargs) -> bool:
+        """
+        点击屏幕上的指定文本
+        
+        :param target_text: 要点击的文本
+        :param timeout: 查找超时时间(秒)
+        :param kwargs: 传递给find_text_position的其他参数
+        :return: 是否成功点击
+        """
+        pos = self.wait_until_text(target_text, timeout=timeout, **kwargs)
+        if pos:
+            x1, y1, x2, y2 = pos
+            center_x = (x1 + x2) // 2
+            center_y = (y1 + y2) // 2
+            self.click(center_x, center_y)
+            return True
+        return False

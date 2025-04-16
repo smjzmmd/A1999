@@ -17,7 +17,7 @@ class ADBController:
         :param timeout: 命令超时时间(秒)
         """
         self.logger = logging.getLogger(__name__)
-        self.adb_path = Path(adb_path).expanduser().resolve()
+        self.adb_path = adb_path
         self.device_serial = device_serial
         self.timeout = timeout
         self._connected = False
